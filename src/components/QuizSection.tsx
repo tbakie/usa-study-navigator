@@ -17,7 +17,7 @@ interface QuizAnswers {
   grade: string;
   english: string;
   motivation: string;
-  scholarshipFactors: string[];
+  scholarshipFactors: string;
   budget: string;
 }
 
@@ -30,7 +30,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
     grade: "",
     english: "",
     motivation: "",
-    scholarshipFactors: [],
+    scholarshipFactors: "",
     budget: "",
   });
 
@@ -75,9 +75,9 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
       case "english":
         return answers.english !== "";
       case "motivation":
-        return answers.motivation !== "" && countWords(answers.motivation) <= 75;
+        return countWords(answers.motivation) <= 75;
       case "scholarshipFactors":
-        return answers.scholarshipFactors.length > 0;
+        return true;
       case "budget":
         return answers.budget !== "";
       case "booking":
@@ -128,24 +128,6 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
     }
   };
 
-  const getScholarshipFactorLabel = (factor: string) => {
-    switch (factor) {
-      case "academic": return "Akademik Başarı";
-      case "project": return "Proje / Araştırma";
-      case "sports": return "Profesyonel Spor";
-      case "arts": return "Sanat";
-      default: return factor;
-    }
-  };
-
-  const toggleScholarshipFactor = (factor: string) => {
-    const current = answers.scholarshipFactors;
-    if (current.includes(factor)) {
-      setAnswers({ ...answers, scholarshipFactors: current.filter(f => f !== factor) });
-    } else {
-      setAnswers({ ...answers, scholarshipFactors: [...current, factor] });
-    }
-  };
 
   return (
     <section ref={quizRef} className="py-20 bg-hero-gradient">
@@ -355,32 +337,21 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   <h3 className="font-display text-2xl text-foreground">Burs Faktörleri</h3>
                 </div>
                 
-                <p className="text-muted-foreground mb-4">
-                  Sana burs verebilecek hangi faktörler var? (Birden fazla seçebilirsin)
-                </p>
-                
-                <div className="grid gap-3">
-                  {[
-                    { value: "academic", label: "Akademik Başarı", desc: "Yüksek not ortalaması, sınav başarıları" },
-                    { value: "project", label: "Proje / Araştırma", desc: "Bilimsel projeler, TÜBİTAK, araştırma deneyimi" },
-                    { value: "sports", label: "Profesyonel Spor", desc: "Milli takım, kulüp sporculuğu, şampiyonluklar" },
-                    { value: "arts", label: "Sanat", desc: "Müzik, resim, tiyatro, dans vb. yetenekler" },
-                  ].map((option) => (
-                    <Button
-                      key={option.value}
-                      variant={answers.scholarshipFactors.includes(option.value) ? "quizSelected" : "quiz"}
-                      className="h-auto py-4 px-6 justify-start text-left"
-                      onClick={() => toggleScholarshipFactor(option.value)}
-                    >
-                      <div>
-                        <div className="font-semibold">{option.label}</div>
-                        <div className="text-sm text-muted-foreground">{option.desc}</div>
-                      </div>
-                      {answers.scholarshipFactors.includes(option.value) && (
-                        <CheckCircle className="w-5 h-5 text-secondary ml-auto" />
-                      )}
-                    </Button>
-                  ))}
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      Sana burs verebilecek ne faktörler var? (Akademik başarı, proje, profesyonel spor, sanat vb.)
+                    </label>
+                    <Textarea
+                      placeholder="Örn: Yüksek GPA, TÜBİTAK projesi, milli takım sporcusu..."
+                      value={answers.scholarshipFactors}
+                      onChange={(e) => handleInputChange("scholarshipFactors", e.target.value)}
+                      className="bg-background border-border min-h-[100px]"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Opsiyonel - Burs için güçlü yönlerini yaz
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -426,21 +397,140 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
             )}
 
             {currentStep === "booking" && (
-              <div className="animate-fade-up text-center">
-                <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-6">
-                  <Calendar className="w-8 h-8 text-secondary" />
-                </div>
-                
-                <h3 className="font-display text-2xl text-foreground mb-4">
-                  Harika! Hadi Konuşalım
-                </h3>
-                
-                <p className="text-muted-foreground mb-8">
-                  Cevaplarına göre sana özel rehberlik sunabilirim. 
-                  Başlamak için ücretsiz görüşme randevusu al.
-                </p>
+              <div className="animate-fade-up">
+                {/* Budget-based result content */}
+                {answers.budget === "0-5k" && (
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-6">
+                      <Target className="w-8 h-8 text-secondary" />
+                    </div>
+                    <h3 className="font-display text-2xl text-foreground mb-4">
+                      Yüksek Burs Stratejisi Gerekli
+                    </h3>
+                    <p className="text-muted-foreground mb-6">
+                      Bu bütçeyle ABD planı yüksek burs stratejisiyle mümkün olabilir.
+                      İlk adım olarak aşağıdaki içeriklerle süreci netleştir.
+                    </p>
+                    <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
+                        <div>
+                          <div className="font-semibold">$25 E-Kitap</div>
+                          <div className="text-sm text-muted-foreground">ABD'de okumak için kapsamlı rehber</div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
+                        <div>
+                          <div className="font-semibold">$120 Birebir Danışmanlık + VIP WhatsApp Grubu</div>
+                          <div className="text-sm text-muted-foreground">Kişiselleştirilmiş rehberlik ve topluluk desteği</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                <div className="bg-muted/50 rounded-xl p-4 mb-8 text-left">
+                {(answers.budget === "5k-15k" || answers.budget === "unsure") && (
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-6">
+                      <Calendar className="w-8 h-8 text-secondary" />
+                    </div>
+                    <h3 className="font-display text-2xl text-foreground mb-4">
+                      Değerlendirme Görüşmesi
+                    </h3>
+                    <p className="text-muted-foreground mb-6">
+                      Uygunluk durumunda aileyle değerlendirme görüşmesi yapılabilir.
+                    </p>
+                    <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
+                        <div>
+                          <div className="font-semibold">$25 E-Kitap</div>
+                          <div className="text-sm text-muted-foreground">ABD'de okumak için kapsamlı rehber</div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
+                        <div>
+                          <div className="font-semibold">$120 Birebir Danışmanlık + VIP WhatsApp Grubu</div>
+                          <div className="text-sm text-muted-foreground">Kişiselleştirilmiş rehberlik ve topluluk desteği</div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
+                        <div>
+                          <div className="font-semibold">Aile ile Birebir Toplantı</div>
+                          <div className="text-sm text-muted-foreground">Detaylı planlama ve strateji görüşmesi</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {answers.budget === "15k-30k" && (
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-6">
+                      <GraduationCap className="w-8 h-8 text-secondary" />
+                    </div>
+                    <h3 className="font-display text-2xl text-foreground mb-4">
+                      Aile Bazlı Planlama
+                    </h3>
+                    <p className="text-muted-foreground mb-6">
+                      Bu bütçe aralığında aile bazlı bir planlama mümkündür.
+                      Uygunluk durumunu netleştirmek için görüşme alabilirsin.
+                    </p>
+                    <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
+                      <div className="flex items-start gap-3 p-4 bg-secondary/10 rounded-lg border border-secondary/20">
+                        <div className="flex-1">
+                          <div className="font-semibold text-secondary">10 Aylık Birebir Danışmanlık-Koçluk</div>
+                          <div className="text-sm text-muted-foreground mt-1">
+                            Tüm süreci beraber yönettiğimiz, özel burslara başvurduğumuz, 
+                            Amerika'nın en iyi okullarına kabul için en güçlü başvuru biçimi
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
+                        <div>
+                          <div className="font-semibold">$120 Birebir Danışmanlık + VIP WhatsApp Grubu</div>
+                          <div className="text-sm text-muted-foreground">Kişiselleştirilmiş rehberlik ve topluluk desteği</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {answers.budget === "30k+" && (
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-6">
+                      <GraduationCap className="w-8 h-8 text-secondary" />
+                    </div>
+                    <h3 className="font-display text-2xl text-foreground mb-4">
+                      Premium Program
+                    </h3>
+                    <p className="text-muted-foreground mb-6">
+                      En kapsamlı danışmanlık programımız için uygunsunuz.
+                    </p>
+                    <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
+                      <div className="flex items-start gap-3 p-4 bg-secondary/10 rounded-lg border border-secondary/20">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-secondary">10 Aylık Birebir Danışmanlık-Koçluk</span>
+                            <span className="text-xs bg-destructive/20 text-destructive px-2 py-0.5 rounded-full font-medium">
+                              Sınırlı Kontenjan
+                            </span>
+                          </div>
+                          <div className="text-sm text-muted-foreground mt-1">
+                            Tüm süreci beraber yönettiğimiz, özel burslara başvurduğumuz, 
+                            Amerika'nın en iyi okullarına kabul için en güçlü başvuru biçimi
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-muted/30 rounded-xl p-4 mb-6 text-left">
                   <div className="text-sm text-muted-foreground mb-2">Profilin:</div>
                   <div className="grid gap-2 text-sm">
                     <div className="flex justify-between">
@@ -463,10 +553,12 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       <span className="text-muted-foreground">İngilizce:</span>
                       <span className="font-medium">{getEnglishLabel(answers.english)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Burs Faktörleri:</span>
-                      <span className="font-medium">{answers.scholarshipFactors.map(f => getScholarshipFactorLabel(f)).join(", ")}</span>
-                    </div>
+                    {answers.scholarshipFactors && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Burs Faktörleri:</span>
+                        <span className="font-medium text-right max-w-[60%]">{answers.scholarshipFactors}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Bütçe:</span>
                       <span className="font-medium">{getBudgetLabel(answers.budget)}</span>
@@ -476,13 +568,13 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
 
                 <Button variant="gold" size="xl" className="w-full mb-4">
                   <Calendar className="w-5 h-5" />
-                  Ücretsiz Görüşme Randevusu Al
+                  Görüşme Randevusu Al
                 </Button>
 
                 <Button
                   variant="ghost"
                   onClick={goBack}
-                  className="text-muted-foreground"
+                  className="w-full text-muted-foreground"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Geri Dön
