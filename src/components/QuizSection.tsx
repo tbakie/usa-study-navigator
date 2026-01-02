@@ -1,17 +1,23 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { ArrowRight, ArrowLeft, Calendar, User, GraduationCap, Languages, CheckCircle } from "lucide-react";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
+import { ArrowRight, ArrowLeft, Calendar, User, GraduationCap, Languages, CheckCircle, DollarSign, Target } from "lucide-react";
 
 interface QuizSectionProps {
   quizRef: React.RefObject<HTMLElement>;
 }
 
-type QuizStep = "role" | "education" | "english" | "booking";
+type QuizStep = "role" | "education" | "schoolInfo" | "english" | "motivation" | "budget" | "booking";
 
 interface QuizAnswers {
   role: string;
   education: string;
+  schoolName: string;
+  grade: string;
   english: string;
+  motivation: string;
+  budget: string;
 }
 
 const QuizSection = ({ quizRef }: QuizSectionProps) => {
@@ -19,15 +25,27 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
   const [answers, setAnswers] = useState<QuizAnswers>({
     role: "",
     education: "",
+    schoolName: "",
+    grade: "",
     english: "",
+    motivation: "",
+    budget: "",
   });
 
-  const steps: QuizStep[] = ["role", "education", "english", "booking"];
+  const steps: QuizStep[] = ["role", "education", "schoolInfo", "english", "motivation", "budget", "booking"];
   const currentIndex = steps.indexOf(currentStep);
   const progress = ((currentIndex + 1) / steps.length) * 100;
 
   const handleSelect = (key: keyof QuizAnswers, value: string) => {
     setAnswers({ ...answers, [key]: value });
+  };
+
+  const handleInputChange = (key: keyof QuizAnswers, value: string) => {
+    setAnswers({ ...answers, [key]: value });
+  };
+
+  const countWords = (text: string) => {
+    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
   };
 
   const goNext = () => {
@@ -50,8 +68,14 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
         return answers.role !== "";
       case "education":
         return answers.education !== "";
+      case "schoolInfo":
+        return answers.schoolName !== "" && answers.grade !== "";
       case "english":
         return answers.english !== "";
+      case "motivation":
+        return answers.motivation !== "" && countWords(answers.motivation) <= 75;
+      case "budget":
+        return answers.budget !== "";
       case "booking":
         return true;
       default:
@@ -79,11 +103,23 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
 
   const getEnglishLabel = (english: string) => {
     switch (english) {
-      case "beginner": return "Başlangıç";
-      case "intermediate": return "Orta";
-      case "advanced": return "İleri";
-      case "native": return "Anadil";
+      case "a1": return "A1 - Başlangıç";
+      case "a2": return "A2 - Temel";
+      case "b1": return "B1 - Orta Altı";
+      case "b2": return "B2 - Orta";
+      case "c1": return "C1 - İleri";
+      case "c2": return "C2 - Anadil Seviyesi";
       default: return english;
+    }
+  };
+
+  const getBudgetLabel = (budget: string) => {
+    switch (budget) {
+      case "under20k": return "$20,000 altı";
+      case "20k-40k": return "$20,000 - $40,000";
+      case "40k-60k": return "$40,000 - $60,000";
+      case "over60k": return "$60,000 üzeri";
+      default: return budget;
     }
   };
 
@@ -172,6 +208,45 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
               </div>
             )}
 
+            {currentStep === "schoolInfo" && (
+              <div className="animate-fade-up">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+                    <GraduationCap className="w-5 h-5 text-secondary" />
+                  </div>
+                  <h3 className="font-display text-2xl text-foreground">Okul Bilgilerin</h3>
+                </div>
+                
+                <div className="grid gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      Okul Adı
+                    </label>
+                    <Input
+                      placeholder="Okulunuzun adını yazın"
+                      value={answers.schoolName}
+                      onChange={(e) => handleInputChange("schoolName", e.target.value)}
+                      className="bg-background border-border"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      Not Ortalamanız (OBP/GPA)
+                    </label>
+                    <Input
+                      placeholder="Örn: 85.50 veya 3.5"
+                      value={answers.grade}
+                      onChange={(e) => handleInputChange("grade", e.target.value)}
+                      className="bg-background border-border"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Lise için OBP, üniversite için GPA yazabilirsiniz
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {currentStep === "english" && (
               <div className="animate-fade-up">
                 <div className="flex items-center gap-3 mb-6">
@@ -183,10 +258,12 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                 
                 <div className="grid gap-3">
                   {[
-                    { value: "beginner", label: "Başlangıç", desc: "Yeni başlıyorum" },
-                    { value: "intermediate", label: "Orta Seviye", desc: "İyi iletişim kurabiliyorum" },
-                    { value: "advanced", label: "İleri Seviye", desc: "Çoğu durumda akıcı" },
-                    { value: "native", label: "Anadil / Anadil Seviyesi", desc: "Tamamen akıcı" },
+                    { value: "a1", label: "Başlangıç", level: "A1", desc: "Temel kelimeler ve kalıplar" },
+                    { value: "a2", label: "Temel", level: "A2", desc: "Basit cümleler kurabiliyorum" },
+                    { value: "b1", label: "Orta Altı", level: "B1", desc: "Günlük konuşmaları anlayabiliyorum" },
+                    { value: "b2", label: "Orta", level: "B2", desc: "Akıcı iletişim kurabiliyorum" },
+                    { value: "c1", label: "İleri", level: "C1", desc: "Karmaşık konularda rahat konuşabiliyorum" },
+                    { value: "c2", label: "Anadil Seviyesi", level: "C2", desc: "Tamamen akıcı" },
                   ].map((option) => (
                     <Button
                       key={option.value}
@@ -194,11 +271,88 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       className="h-auto py-4 px-6 justify-start text-left"
                       onClick={() => handleSelect("english", option.value)}
                     >
+                      <div className="flex items-center gap-3 flex-1">
+                        <span className="bg-secondary/20 text-secondary text-xs font-bold px-2 py-1 rounded">
+                          {option.level}
+                        </span>
+                        <div>
+                          <div className="font-semibold">{option.label}</div>
+                          <div className="text-sm text-muted-foreground">{option.desc}</div>
+                        </div>
+                      </div>
+                      {answers.english === option.value && (
+                        <CheckCircle className="w-5 h-5 text-secondary ml-auto" />
+                      )}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {currentStep === "motivation" && (
+              <div className="animate-fade-up">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+                    <Target className="w-5 h-5 text-secondary" />
+                  </div>
+                  <h3 className="font-display text-2xl text-foreground">Hedefin ve Motivasyonun</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      ABD'de üniversite hedefin ne kadar ciddi ve neden burada okumak istiyorsun?
+                    </label>
+                    <Textarea
+                      placeholder="Hedeflerini ve motivasyonunu buraya yaz..."
+                      value={answers.motivation}
+                      onChange={(e) => handleInputChange("motivation", e.target.value)}
+                      className="bg-background border-border min-h-[120px]"
+                    />
+                    <div className="flex justify-between mt-2">
+                      <p className="text-xs text-muted-foreground">
+                        Maksimum 75 kelime
+                      </p>
+                      <p className={`text-xs ${countWords(answers.motivation) > 75 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                        {countWords(answers.motivation)} / 75 kelime
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentStep === "budget" && (
+              <div className="animate-fade-up">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+                    <DollarSign className="w-5 h-5 text-secondary" />
+                  </div>
+                  <h3 className="font-display text-2xl text-foreground">Aile Bütçesi</h3>
+                </div>
+                
+                <p className="text-muted-foreground mb-4">
+                  Burs olmadığı durumda aileniz yıllık yaklaşık ne kadar bütçe ayırabilir? (Dolar bazında)
+                </p>
+                
+                <div className="grid gap-3">
+                  {[
+                    { value: "under20k", label: "$20,000 altı", desc: "Yıllık 20.000 dolardan az" },
+                    { value: "20k-40k", label: "$20,000 - $40,000", desc: "Yıllık 20.000 - 40.000 dolar arası" },
+                    { value: "40k-60k", label: "$40,000 - $60,000", desc: "Yıllık 40.000 - 60.000 dolar arası" },
+                    { value: "over60k", label: "$60,000 üzeri", desc: "Yıllık 60.000 dolardan fazla" },
+                  ].map((option) => (
+                    <Button
+                      key={option.value}
+                      variant={answers.budget === option.value ? "quizSelected" : "quiz"}
+                      className="h-auto py-4 px-6 justify-start text-left"
+                      onClick={() => handleSelect("budget", option.value)}
+                    >
                       <div>
                         <div className="font-semibold">{option.label}</div>
                         <div className="text-sm text-muted-foreground">{option.desc}</div>
                       </div>
-                      {answers.english === option.value && (
+                      {answers.budget === option.value && (
                         <CheckCircle className="w-5 h-5 text-secondary ml-auto" />
                       )}
                     </Button>
@@ -234,8 +388,20 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       <span className="font-medium">{getEducationLabel(answers.education)}</span>
                     </div>
                     <div className="flex justify-between">
+                      <span className="text-muted-foreground">Okul:</span>
+                      <span className="font-medium">{answers.schoolName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Not:</span>
+                      <span className="font-medium">{answers.grade}</span>
+                    </div>
+                    <div className="flex justify-between">
                       <span className="text-muted-foreground">İngilizce:</span>
                       <span className="font-medium">{getEnglishLabel(answers.english)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Bütçe:</span>
+                      <span className="font-medium">{getBudgetLabel(answers.budget)}</span>
                     </div>
                   </div>
                 </div>
