@@ -59,6 +59,34 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
     }
   };
 
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case "student": return "Öğrenci";
+      case "parent": return "Veli";
+      default: return role;
+    }
+  };
+
+  const getEducationLabel = (education: string) => {
+    switch (education) {
+      case "highschool": return "Lise";
+      case "undergraduate": return "Lisans";
+      case "graduate": return "Yüksek Lisans";
+      case "professional": return "Çalışan";
+      default: return education;
+    }
+  };
+
+  const getEnglishLabel = (english: string) => {
+    switch (english) {
+      case "beginner": return "Başlangıç";
+      case "intermediate": return "Orta";
+      case "advanced": return "İleri";
+      case "native": return "Anadil";
+      default: return english;
+    }
+  };
+
   return (
     <section ref={quizRef} className="py-20 bg-hero-gradient">
       <div className="container mx-auto px-4">
@@ -66,8 +94,8 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
           {/* Progress bar */}
           <div className="mb-8">
             <div className="flex justify-between text-cream/60 text-sm mb-2">
-              <span>Step {currentIndex + 1} of {steps.length}</span>
-              <span>{Math.round(progress)}% complete</span>
+              <span>Adım {currentIndex + 1} / {steps.length}</span>
+              <span>%{Math.round(progress)} tamamlandı</span>
             </div>
             <div className="h-2 bg-card/20 rounded-full overflow-hidden">
               <div 
@@ -85,13 +113,13 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
                     <User className="w-5 h-5 text-secondary" />
                   </div>
-                  <h3 className="font-display text-2xl text-foreground">Who are you?</h3>
+                  <h3 className="font-display text-2xl text-foreground">Siz kimsiniz?</h3>
                 </div>
                 
                 <div className="grid gap-4">
                   {[
-                    { value: "student", label: "I'm a Student", desc: "Looking to study in the USA" },
-                    { value: "parent", label: "I'm a Parent", desc: "Helping my child apply" },
+                    { value: "student", label: "Öğrenciyim", desc: "Amerika'da okumak istiyorum" },
+                    { value: "parent", label: "Veliyim", desc: "Çocuğumun başvurusuna yardım ediyorum" },
                   ].map((option) => (
                     <Button
                       key={option.value}
@@ -118,15 +146,15 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
                     <GraduationCap className="w-5 h-5 text-secondary" />
                   </div>
-                  <h3 className="font-display text-2xl text-foreground">Education Level</h3>
+                  <h3 className="font-display text-2xl text-foreground">Eğitim Seviyeniz</h3>
                 </div>
                 
                 <div className="grid gap-3">
                   {[
-                    { value: "highschool", label: "High School Student" },
-                    { value: "undergraduate", label: "Undergraduate Student" },
-                    { value: "graduate", label: "Graduate / Master's" },
-                    { value: "professional", label: "Working Professional" },
+                    { value: "highschool", label: "Lise Öğrencisi" },
+                    { value: "undergraduate", label: "Lisans Öğrencisi" },
+                    { value: "graduate", label: "Yüksek Lisans / Doktora" },
+                    { value: "professional", label: "Çalışan Profesyonel" },
                   ].map((option) => (
                     <Button
                       key={option.value}
@@ -150,15 +178,15 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
                     <Languages className="w-5 h-5 text-secondary" />
                   </div>
-                  <h3 className="font-display text-2xl text-foreground">English Level</h3>
+                  <h3 className="font-display text-2xl text-foreground">İngilizce Seviyeniz</h3>
                 </div>
                 
                 <div className="grid gap-3">
                   {[
-                    { value: "beginner", label: "Beginner", desc: "Just starting out" },
-                    { value: "intermediate", label: "Intermediate", desc: "Can communicate well" },
-                    { value: "advanced", label: "Advanced", desc: "Fluent in most situations" },
-                    { value: "native", label: "Native / Near-native", desc: "Fully fluent" },
+                    { value: "beginner", label: "Başlangıç", desc: "Yeni başlıyorum" },
+                    { value: "intermediate", label: "Orta Seviye", desc: "İyi iletişim kurabiliyorum" },
+                    { value: "advanced", label: "İleri Seviye", desc: "Çoğu durumda akıcı" },
+                    { value: "native", label: "Anadil / Anadil Seviyesi", desc: "Tamamen akıcı" },
                   ].map((option) => (
                     <Button
                       key={option.value}
@@ -186,35 +214,44 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                 </div>
                 
                 <h3 className="font-display text-2xl text-foreground mb-4">
-                  Perfect! Let's Talk
+                  Harika! Hadi Konuşalım
                 </h3>
                 
                 <p className="text-muted-foreground mb-8">
-                  Based on your answers, I can provide personalized guidance for your journey. 
-                  Book a free consultation to get started.
+                  Cevaplarına göre sana özel rehberlik sunabilirim. 
+                  Başlamak için ücretsiz görüşme randevusu al.
                 </p>
 
                 <div className="bg-muted/50 rounded-xl p-4 mb-8 text-left">
-                  <div className="text-sm text-muted-foreground mb-2">Your Profile:</div>
+                  <div className="text-sm text-muted-foreground mb-2">Profilin:</div>
                   <div className="grid gap-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Role:</span>
-                      <span className="font-medium capitalize">{answers.role}</span>
+                      <span className="text-muted-foreground">Rol:</span>
+                      <span className="font-medium">{getRoleLabel(answers.role)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Education:</span>
-                      <span className="font-medium capitalize">{answers.education.replace(/([A-Z])/g, ' $1').trim()}</span>
+                      <span className="text-muted-foreground">Eğitim:</span>
+                      <span className="font-medium">{getEducationLabel(answers.education)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">English:</span>
-                      <span className="font-medium capitalize">{answers.english}</span>
+                      <span className="text-muted-foreground">İngilizce:</span>
+                      <span className="font-medium">{getEnglishLabel(answers.english)}</span>
                     </div>
                   </div>
                 </div>
 
-                <Button variant="gold" size="xl" className="w-full">
+                <Button variant="gold" size="xl" className="w-full mb-4">
                   <Calendar className="w-5 h-5" />
-                  Book Free Consultation
+                  Ücretsiz Görüşme Randevusu Al
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  onClick={goBack}
+                  className="text-muted-foreground"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Geri Dön
                 </Button>
               </div>
             )}
@@ -229,7 +266,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   className="text-muted-foreground"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
+                  Geri
                 </Button>
                 
                 <Button
@@ -237,7 +274,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   onClick={goNext}
                   disabled={!canProceed()}
                 >
-                  Continue
+                  Devam Et
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>

@@ -3,26 +3,26 @@ import { Lightbulb, FileText, DollarSign, GraduationCap } from "lucide-react";
 const tips = [
   {
     icon: GraduationCap,
-    title: "University Selection",
-    description: "Learn how to choose the right university based on your goals, budget, and career aspirations.",
+    title: "Üniversite Seçimi",
+    description: "Hedeflerine, bütçene ve kariyer hedeflerine göre doğru üniversiteyi nasıl seçeceğini öğren.",
     color: "bg-blue-500/10 text-blue-600",
   },
   {
     icon: FileText,
-    title: "Application Strategy",
-    description: "Craft compelling essays and applications that stand out from thousands of applicants.",
+    title: "Başvuru Stratejisi",
+    description: "Binlerce başvurucu arasından sıyrılan etkileyici essayler ve başvurular hazırla.",
     color: "bg-purple-500/10 text-purple-600",
   },
   {
     icon: DollarSign,
-    title: "Scholarship Secrets",
-    description: "Discover hidden scholarships and funding opportunities that most students don't know about.",
+    title: "Burs Sırları",
+    description: "Çoğu öğrencinin bilmediği gizli bursları ve fonlama fırsatlarını keşfet.",
     color: "bg-green-500/10 text-green-600",
   },
   {
     icon: Lightbulb,
-    title: "Visa Guidance",
-    description: "Navigate the F-1 visa process with confidence and avoid common mistakes.",
+    title: "Vize Rehberliği",
+    description: "F-1 vize sürecini güvenle yönet ve yaygın hatalardan kaçın.",
     color: "bg-amber-500/10 text-amber-600",
   },
 ];
@@ -33,10 +33,10 @@ const TipsSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-14">
           <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">
-            How I Can Help You
+            Sana Nasıl Yardım Edebilirim
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Expert guidance at every step of your journey to American universities
+            Amerikan üniversitelerine giden yolculuğunun her adımında uzman rehberlik
           </p>
         </div>
 

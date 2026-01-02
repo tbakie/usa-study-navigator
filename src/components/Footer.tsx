@@ -21,11 +21,11 @@ const Footer = () => {
           </div>
 
           <p className="text-cream/60 text-sm mb-4">
-            Helping students achieve their American dream, one application at a time.
+            Öğrencilerin Amerikan rüyasına ulaşmasına yardım ediyorum, adım adım.
           </p>
 
           <p className="text-cream/40 text-xs flex items-center justify-center gap-1">
-            Made with <Heart className="w-3 h-3 text-secondary fill-secondary" /> for future scholars
+            Geleceğin akademisyenleri için <Heart className="w-3 h-3 text-secondary fill-secondary" /> ile yapıldı
           </p>
         </div>
       </div>
