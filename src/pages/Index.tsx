@@ -1,9 +1,10 @@
 import { useRef } from "react";
 import HeroSection from "@/components/HeroSection";
-import TestimonialsSection from "@/components/TestimonialsSection";
 import TipsSection from "@/components/TipsSection";
 import QuizSection from "@/components/QuizSection";
+import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
+import FloatingBookingButton from "@/components/FloatingBookingButton";
 
 const Index = () => {
   const quizRef = useRef<HTMLElement>(null);
@@ -15,10 +16,11 @@ const Index = () => {
   return (
     <main className="min-h-screen">
       <HeroSection onStartQuiz={scrollToQuiz} />
-      <TestimonialsSection />
       <TipsSection />
       <QuizSection quizRef={quizRef} />
+      <TestimonialsSection />
       <Footer />
+      <FloatingBookingButton onClick={scrollToQuiz} />
     </main>
   );
 };

@@ -1,4 +1,4 @@
-import { Play, Instagram, ArrowDown } from "lucide-react";
+import { Play, Instagram, Calendar } from "lucide-react";
 import { Button } from "./ui/button";
 
 interface HeroSectionProps {
@@ -29,19 +29,19 @@ const HeroSection = ({ onStartQuiz }: HeroSectionProps) => {
         {/* Main content */}
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-cream leading-tight mb-6">
-            Your Journey to{" "}
-            <span className="text-gradient">Studying in the USA</span>{" "}
-            Starts Here
+            Amerika'da{" "}
+            <span className="text-gradient">Eğitim Hayalin</span>{" "}
+            Burada Başlıyor
           </h1>
           
           <p className="text-cream/80 text-lg md:text-xl mb-10 font-body leading-relaxed">
-            Expert guidance on admissions, scholarships, and building your American dream. 
-            I've helped 500+ students achieve their goals.
+            Üniversite başvuruları, burslar ve Amerikan rüyanı gerçekleştirmek için uzman rehberlik. 
+            500+ öğrencinin hedeflerine ulaşmasına yardım ettim.
           </p>
         </div>
 
         {/* Video section */}
-        <div className="max-w-2xl mx-auto mb-12">
+        <div className="max-w-2xl mx-auto mb-8">
           <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lifted bg-primary/50 backdrop-blur-sm border border-card/20">
             {/* Video placeholder - replace with actual video */}
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-navy to-navy-light">
@@ -49,29 +49,29 @@ const HeroSection = ({ onStartQuiz }: HeroSectionProps) => {
                 <button className="w-20 h-20 rounded-full bg-gold-gradient flex items-center justify-center shadow-gold hover:scale-110 transition-transform mb-4 mx-auto">
                   <Play className="w-8 h-8 text-primary ml-1" fill="currentColor" />
                 </button>
-                <p className="text-cream/60 text-sm">Watch my message for you</p>
+                <p className="text-cream/60 text-sm">Senin için hazırladığım videoyu izle</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* CTA buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button variant="gold" size="xl" onClick={onStartQuiz}>
-            Start Your Journey
-            <ArrowDown className="w-5 h-5" />
+        {/* Booking CTA directly under video */}
+        <div className="max-w-md mx-auto mb-12">
+          <Button variant="gold" size="xl" className="w-full" onClick={onStartQuiz}>
+            <Calendar className="w-5 h-5" />
+            Ücretsiz Görüşme Randevusu Al
           </Button>
-          <Button variant="hero" size="lg">
-            View Success Stories
-          </Button>
+          <p className="text-cream/60 text-sm text-center mt-3">
+            Hızlı anket sonrası sana özel görüşme
+          </p>
         </div>
 
         {/* Stats */}
-        <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
+        <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto">
           {[
-            { number: "500+", label: "Students Helped" },
-            { number: "$2M+", label: "Scholarships Won" },
-            { number: "98%", label: "Success Rate" },
+            { number: "500+", label: "Öğrenciye Yardım" },
+            { number: "$2M+", label: "Kazanılan Burs" },
+            { number: "%98", label: "Başarı Oranı" },
           ].map((stat, index) => (
             <div key={index} className="text-center">
               <div className="font-display text-2xl md:text-3xl text-secondary mb-1">
