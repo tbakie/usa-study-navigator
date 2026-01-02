@@ -8,7 +8,7 @@ interface QuizSectionProps {
   quizRef: React.RefObject<HTMLElement>;
 }
 
-type QuizStep = "role" | "education" | "schoolInfo" | "english" | "motivation" | "budget" | "booking";
+type QuizStep = "role" | "education" | "schoolInfo" | "english" | "motivation" | "scholarshipFactors" | "budget" | "booking";
 
 interface QuizAnswers {
   role: string;
@@ -17,6 +17,7 @@ interface QuizAnswers {
   grade: string;
   english: string;
   motivation: string;
+  scholarshipFactors: string[];
   budget: string;
 }
 
@@ -29,10 +30,11 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
     grade: "",
     english: "",
     motivation: "",
+    scholarshipFactors: [],
     budget: "",
   });
 
-  const steps: QuizStep[] = ["role", "education", "schoolInfo", "english", "motivation", "budget", "booking"];
+  const steps: QuizStep[] = ["role", "education", "schoolInfo", "english", "motivation", "scholarshipFactors", "budget", "booking"];
   const currentIndex = steps.indexOf(currentStep);
   const progress = ((currentIndex + 1) / steps.length) * 100;
 
@@ -74,6 +76,8 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
         return answers.english !== "";
       case "motivation":
         return answers.motivation !== "" && countWords(answers.motivation) <= 75;
+      case "scholarshipFactors":
+        return answers.scholarshipFactors.length > 0;
       case "budget":
         return answers.budget !== "";
       case "booking":
@@ -115,11 +119,31 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
 
   const getBudgetLabel = (budget: string) => {
     switch (budget) {
-      case "under20k": return "$20,000 altı";
-      case "20k-40k": return "$20,000 - $40,000";
-      case "40k-60k": return "$40,000 - $60,000";
-      case "over60k": return "$60,000 üzeri";
+      case "0-5k": return "$0 - $5,000";
+      case "5k-15k": return "$5,000 - $15,000";
+      case "15k-30k": return "$15,000 - $30,000";
+      case "30k+": return "$30,000+";
+      case "unsure": return "Emin Değilim";
       default: return budget;
+    }
+  };
+
+  const getScholarshipFactorLabel = (factor: string) => {
+    switch (factor) {
+      case "academic": return "Akademik Başarı";
+      case "project": return "Proje / Araştırma";
+      case "sports": return "Profesyonel Spor";
+      case "arts": return "Sanat";
+      default: return factor;
+    }
+  };
+
+  const toggleScholarshipFactor = (factor: string) => {
+    const current = answers.scholarshipFactors;
+    if (current.includes(factor)) {
+      setAnswers({ ...answers, scholarshipFactors: current.filter(f => f !== factor) });
+    } else {
+      setAnswers({ ...answers, scholarshipFactors: [...current, factor] });
     }
   };
 
@@ -322,6 +346,45 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
               </div>
             )}
 
+            {currentStep === "scholarshipFactors" && (
+              <div className="animate-fade-up">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+                    <GraduationCap className="w-5 h-5 text-secondary" />
+                  </div>
+                  <h3 className="font-display text-2xl text-foreground">Burs Faktörleri</h3>
+                </div>
+                
+                <p className="text-muted-foreground mb-4">
+                  Sana burs verebilecek hangi faktörler var? (Birden fazla seçebilirsin)
+                </p>
+                
+                <div className="grid gap-3">
+                  {[
+                    { value: "academic", label: "Akademik Başarı", desc: "Yüksek not ortalaması, sınav başarıları" },
+                    { value: "project", label: "Proje / Araştırma", desc: "Bilimsel projeler, TÜBİTAK, araştırma deneyimi" },
+                    { value: "sports", label: "Profesyonel Spor", desc: "Milli takım, kulüp sporculuğu, şampiyonluklar" },
+                    { value: "arts", label: "Sanat", desc: "Müzik, resim, tiyatro, dans vb. yetenekler" },
+                  ].map((option) => (
+                    <Button
+                      key={option.value}
+                      variant={answers.scholarshipFactors.includes(option.value) ? "quizSelected" : "quiz"}
+                      className="h-auto py-4 px-6 justify-start text-left"
+                      onClick={() => toggleScholarshipFactor(option.value)}
+                    >
+                      <div>
+                        <div className="font-semibold">{option.label}</div>
+                        <div className="text-sm text-muted-foreground">{option.desc}</div>
+                      </div>
+                      {answers.scholarshipFactors.includes(option.value) && (
+                        <CheckCircle className="w-5 h-5 text-secondary ml-auto" />
+                      )}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {currentStep === "budget" && (
               <div className="animate-fade-up">
                 <div className="flex items-center gap-3 mb-6">
@@ -337,10 +400,11 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                 
                 <div className="grid gap-3">
                   {[
-                    { value: "under20k", label: "$20,000 altı", desc: "Yıllık 20.000 dolardan az" },
-                    { value: "20k-40k", label: "$20,000 - $40,000", desc: "Yıllık 20.000 - 40.000 dolar arası" },
-                    { value: "40k-60k", label: "$40,000 - $60,000", desc: "Yıllık 40.000 - 60.000 dolar arası" },
-                    { value: "over60k", label: "$60,000 üzeri", desc: "Yıllık 60.000 dolardan fazla" },
+                    { value: "0-5k", label: "$0 - $5,000", desc: "Yıllık 5.000 dolara kadar" },
+                    { value: "5k-15k", label: "$5,000 - $15,000", desc: "Yıllık 5.000 - 15.000 dolar arası" },
+                    { value: "15k-30k", label: "$15,000 - $30,000", desc: "Yıllık 15.000 - 30.000 dolar arası" },
+                    { value: "30k+", label: "$30,000+", desc: "Yıllık 30.000 dolardan fazla" },
+                    { value: "unsure", label: "Emin Değilim", desc: "Henüz net bir bütçe belirlemedik" },
                   ].map((option) => (
                     <Button
                       key={option.value}
@@ -398,6 +462,10 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">İngilizce:</span>
                       <span className="font-medium">{getEnglishLabel(answers.english)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Burs Faktörleri:</span>
+                      <span className="font-medium">{answers.scholarshipFactors.map(f => getScholarshipFactorLabel(f)).join(", ")}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Bütçe:</span>
