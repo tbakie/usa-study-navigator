@@ -1,0 +1,89 @@
+import { Play, Instagram, ArrowDown } from "lucide-react";
+import { Button } from "./ui/button";
+
+interface HeroSectionProps {
+  onStartQuiz: () => void;
+}
+
+const HeroSection = ({ onStartQuiz }: HeroSectionProps) => {
+  return (
+    <section className="relative min-h-screen bg-hero-gradient overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-10 w-64 h-64 bg-secondary/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-40 left-10 w-48 h-48 bg-secondary/5 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }} />
+      </div>
+
+      <div className="relative container mx-auto px-4 pt-12 pb-20">
+        {/* Instagram badge */}
+        <div className="flex justify-center mb-8">
+          <a 
+            href="#" 
+            className="inline-flex items-center gap-2 bg-card/10 backdrop-blur-sm text-cream px-4 py-2 rounded-full text-sm border border-card/20 hover:bg-card/20 transition-all"
+          >
+            <Instagram className="w-4 h-4" />
+            <span>@yourusername</span>
+          </a>
+        </div>
+
+        {/* Main content */}
+        <div className="text-center max-w-3xl mx-auto">
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-cream leading-tight mb-6">
+            Your Journey to{" "}
+            <span className="text-gradient">Studying in the USA</span>{" "}
+            Starts Here
+          </h1>
+          
+          <p className="text-cream/80 text-lg md:text-xl mb-10 font-body leading-relaxed">
+            Expert guidance on admissions, scholarships, and building your American dream. 
+            I've helped 500+ students achieve their goals.
+          </p>
+        </div>
+
+        {/* Video section */}
+        <div className="max-w-2xl mx-auto mb-12">
+          <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lifted bg-primary/50 backdrop-blur-sm border border-card/20">
+            {/* Video placeholder - replace with actual video */}
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-navy to-navy-light">
+              <div className="text-center">
+                <button className="w-20 h-20 rounded-full bg-gold-gradient flex items-center justify-center shadow-gold hover:scale-110 transition-transform mb-4 mx-auto">
+                  <Play className="w-8 h-8 text-primary ml-1" fill="currentColor" />
+                </button>
+                <p className="text-cream/60 text-sm">Watch my message for you</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <Button variant="gold" size="xl" onClick={onStartQuiz}>
+            Start Your Journey
+            <ArrowDown className="w-5 h-5" />
+          </Button>
+          <Button variant="hero" size="lg">
+            View Success Stories
+          </Button>
+        </div>
+
+        {/* Stats */}
+        <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
+          {[
+            { number: "500+", label: "Students Helped" },
+            { number: "$2M+", label: "Scholarships Won" },
+            { number: "98%", label: "Success Rate" },
+          ].map((stat, index) => (
+            <div key={index} className="text-center">
+              <div className="font-display text-2xl md:text-3xl text-secondary mb-1">
+                {stat.number}
+              </div>
+              <div className="text-cream/60 text-xs md:text-sm">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default HeroSection;
