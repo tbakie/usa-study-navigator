@@ -1,28 +1,26 @@
 import { Play, Instagram, Calendar } from "lucide-react";
 import { Button } from "./ui/button";
-
 interface HeroSectionProps {
   onStartQuiz: () => void;
 }
-
-const HeroSection = ({ onStartQuiz }: HeroSectionProps) => {
-  return (
-    <section className="relative min-h-screen bg-hero-gradient overflow-hidden">
+const HeroSection = ({
+  onStartQuiz
+}: HeroSectionProps) => {
+  return <section className="relative min-h-screen bg-hero-gradient overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 right-10 w-64 h-64 bg-secondary/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-40 left-10 w-48 h-48 bg-secondary/5 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-40 left-10 w-48 h-48 bg-secondary/5 rounded-full blur-2xl animate-float" style={{
+        animationDelay: '2s'
+      }} />
       </div>
 
       <div className="relative container mx-auto px-4 pt-12 pb-20">
         {/* Instagram badge */}
         <div className="flex justify-center mb-8">
-          <a 
-            href="#" 
-            className="inline-flex items-center gap-2 bg-card/10 backdrop-blur-sm text-cream px-4 py-2 rounded-full text-sm border border-card/20 hover:bg-card/20 transition-all"
-          >
+          <a href="#" className="inline-flex items-center gap-2 bg-card/10 backdrop-blur-sm text-cream px-4 py-2 rounded-full text-sm border border-card/20 hover:bg-card/20 transition-all">
             <Instagram className="w-4 h-4" />
-            <span>@yourusername</span>
+            <span>@amerikali.tbe</span>
           </a>
         </div>
 
@@ -68,22 +66,23 @@ const HeroSection = ({ onStartQuiz }: HeroSectionProps) => {
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto">
-          {[
-            { number: "500+", label: "Öğrenciye Yardım" },
-            { number: "$2M+", label: "Kazanılan Burs" },
-            { number: "%98", label: "Başarı Oranı" },
-          ].map((stat, index) => (
-            <div key={index} className="text-center">
+          {[{
+          number: "500+",
+          label: "Öğrenciye Yardım"
+        }, {
+          number: "$2M+",
+          label: "Kazanılan Burs"
+        }, {
+          number: "%98",
+          label: "Başarı Oranı"
+        }].map((stat, index) => <div key={index} className="text-center">
               <div className="font-display text-2xl md:text-3xl text-secondary mb-1">
                 {stat.number}
               </div>
               <div className="text-cream/60 text-xs md:text-sm">{stat.label}</div>
-            </div>
-          ))}
+            </div>)}
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;
