@@ -43,8 +43,8 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
   // Different step flows based on role
   const getSteps = (): QuizStep[] => {
     if (answers.role === "parent") {
-      // Parent flow: no motivation step
-      return ["role", "education", "schoolInfo", "english", "scholarshipFactors", "budget", "contact", "booking"];
+      // Parent flow: includes citizenship before scholarshipFactors
+      return ["role", "education", "schoolInfo", "english", "citizenship", "scholarshipFactors", "budget", "contact", "booking"];
     }
     // Student flow: includes citizenship and motivation
     return ["role", "education", "schoolInfo", "english", "citizenship", "motivation", "scholarshipFactors", "budget", "contact", "booking"];
@@ -333,13 +333,17 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
                     <User className="w-5 h-5 text-secondary" />
                   </div>
-                  <h3 className="font-display text-2xl text-foreground">Vatandaşlık / İkamet Durumu</h3>
+                  <h3 className="font-display text-2xl text-foreground">
+                    {isParent ? "Öğrencinin Vatandaşlık / İkamet Durumu" : "Vatandaşlık / İkamet Durumu"}
+                  </h3>
                 </div>
                 
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium text-foreground mb-2 block">
-                      Başvuruda gösterebileceğin vatandaşlık veya ikamet durumun nedir?
+                      {isParent 
+                        ? "Başvuruda gösterebileceğiniz vatandaşlık veya ikamet durumu nedir?" 
+                        : "Başvuruda gösterebileceğin vatandaşlık veya ikamet durumun nedir?"}
                     </label>
                     <Textarea
                       placeholder="Örn: Türk vatandaşı, ABD vatandaşı, Green Card sahibi, Avrupa vatandaşı, çifte vatandaşlık vb."
@@ -523,21 +527,24 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       İlk adım olarak aşağıdaki içeriklerle süreci netleştir.
                     </p>
                     <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
-                      <div className="flex items-start gap-3">
+                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group">
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
-                        <div>
+                        <div className="flex-1">
                           <div className="font-semibold">$25 E-Kitap</div>
                           <div className="text-sm text-muted-foreground">ABD'de okumak için kapsamlı rehber</div>
+                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
                         </div>
-                      </div>
-                      <div className="flex items-start gap-3">
+                      </button>
+                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group">
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
-                        <div>
+                        <div className="flex-1">
                           <div className="font-semibold">$120 Birebir Danışmanlık + VIP WhatsApp Grubu</div>
                           <div className="text-sm text-muted-foreground">Kişiselleştirilmiş rehberlik ve topluluk desteği</div>
+                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
                         </div>
-                      </div>
+                      </button>
                     </div>
+                    <p className="text-xs text-muted-foreground mt-4">* Henüz tüm detaylar eklenmedi - yakında güncellenecek</p>
                   </div>
                 )}
 
@@ -553,28 +560,37 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       Uygunluk durumunda aileyle değerlendirme görüşmesi yapılabilir.
                     </p>
                     <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
-                      <div className="flex items-start gap-3">
+                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group">
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
-                        <div>
+                        <div className="flex-1">
                           <div className="font-semibold">$25 E-Kitap</div>
                           <div className="text-sm text-muted-foreground">ABD'de okumak için kapsamlı rehber</div>
+                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
                         </div>
-                      </div>
-                      <div className="flex items-start gap-3">
+                      </button>
+                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group">
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
-                        <div>
+                        <div className="flex-1">
                           <div className="font-semibold">$120 Birebir Danışmanlık + VIP WhatsApp Grubu</div>
                           <div className="text-sm text-muted-foreground">Kişiselleştirilmiş rehberlik ve topluluk desteği</div>
+                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
                         </div>
-                      </div>
-                      <div className="flex items-start gap-3">
+                      </button>
+                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group p-4 bg-secondary/10 rounded-lg border border-destructive/40">
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
-                        <div>
-                          <div className="font-semibold">Aile ile Birebir Toplantı</div>
-                          <div className="text-sm text-muted-foreground">Detaylı planlama ve strateji görüşmesi</div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold">10 Aylık Danışmanlık + Tam Başvuru Süreci</span>
+                            <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
+                              Sınırlı Kontenjan
+                            </span>
+                          </div>
+                          <div className="text-sm text-muted-foreground mt-1">Aile ile toplantı: Detaylı planlama ve strateji görüşmesi</div>
+                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
                         </div>
-                      </div>
+                      </button>
                     </div>
+                    <p className="text-xs text-muted-foreground mt-4">* Henüz tüm detaylar eklenmedi - yakında güncellenecek</p>
                   </div>
                 )}
 
@@ -591,23 +607,26 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       Uygunluk durumunu netleştirmek için görüşme alabilirsin.
                     </p>
                     <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
-                      <div className="flex items-start gap-3 p-4 bg-secondary/10 rounded-lg border border-secondary/20">
+                      <button className="flex items-start gap-3 w-full text-left p-4 bg-secondary/10 rounded-lg border border-secondary/20 hover:bg-secondary/20 transition-colors group">
                         <div className="flex-1">
-                          <div className="font-semibold text-secondary">10 Aylık Birebir Danışmanlık-Koçluk</div>
+                          <div className="font-semibold text-secondary">10 Aylık Danışmanlık + Tam Başvuru Süreci</div>
                           <div className="text-sm text-muted-foreground mt-1">
-                            Tüm süreci beraber yönettiğimiz, özel burslara başvurduğumuz, 
+                            Aile ile toplantı: Tüm süreci beraber yönettiğimiz, özel burslara başvurduğumuz, 
                             Amerika'nın en iyi okullarına kabul için en güçlü başvuru biçimi
                           </div>
+                          <div className="text-xs text-secondary mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
                         </div>
-                      </div>
-                      <div className="flex items-start gap-3">
+                      </button>
+                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group">
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
-                        <div>
+                        <div className="flex-1">
                           <div className="font-semibold">$120 Birebir Danışmanlık + VIP WhatsApp Grubu</div>
                           <div className="text-sm text-muted-foreground">Kişiselleştirilmiş rehberlik ve topluluk desteği</div>
+                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
                         </div>
-                      </div>
+                      </button>
                     </div>
+                    <p className="text-xs text-muted-foreground mt-4">* Henüz tüm detaylar eklenmedi - yakında güncellenecek</p>
                   </div>
                 )}
 
@@ -623,21 +642,23 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       En kapsamlı danışmanlık programımız için uygunsunuz.
                     </p>
                     <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
-                      <div className="flex items-start gap-3 p-4 bg-secondary/10 rounded-lg border border-secondary/20">
+                      <button className="flex items-start gap-3 w-full text-left p-4 bg-secondary/10 rounded-lg border border-secondary/20 hover:bg-secondary/20 transition-colors group">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-secondary">10 Aylık Birebir Danışmanlık-Koçluk</span>
-                            <span className="text-xs bg-destructive/20 text-destructive px-2 py-0.5 rounded-full font-medium">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-secondary">10 Aylık Danışmanlık + Tam Başvuru Süreci</span>
+                            <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
                               Sınırlı Kontenjan
                             </span>
                           </div>
                           <div className="text-sm text-muted-foreground mt-1">
-                            Tüm süreci beraber yönettiğimiz, özel burslara başvurduğumuz, 
+                            Aile ile toplantı: Tüm süreci beraber yönettiğimiz, özel burslara başvurduğumuz, 
                             Amerika'nın en iyi okullarına kabul için en güçlü başvuru biçimi
                           </div>
+                          <div className="text-xs text-secondary mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
                         </div>
-                      </div>
+                      </button>
                     </div>
+                    <p className="text-xs text-muted-foreground mt-4">* Henüz tüm detaylar eklenmedi - yakında güncellenecek</p>
                   </div>
                 )}
 
