@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { ArrowRight, ArrowLeft, Calendar, User, GraduationCap, Languages, CheckCircle, DollarSign, Target } from "lucide-react";
+import { ArrowRight, ArrowLeft, Calendar, User, GraduationCap, Languages, CheckCircle, DollarSign, Target, Phone, Instagram } from "lucide-react";
 
 interface QuizSectionProps {
   quizRef: React.RefObject<HTMLElement>;
 }
 
-type QuizStep = "role" | "education" | "schoolInfo" | "english" | "motivation" | "scholarshipFactors" | "budget" | "booking";
+type QuizStep = "role" | "education" | "schoolInfo" | "english" | "citizenship" | "motivation" | "scholarshipFactors" | "budget" | "contact" | "booking";
 
 interface QuizAnswers {
   role: string;
@@ -16,9 +16,12 @@ interface QuizAnswers {
   schoolName: string;
   grade: string;
   english: string;
+  citizenship: string;
   motivation: string;
   scholarshipFactors: string;
   budget: string;
+  whatsapp: string;
+  instagram: string;
 }
 
 const QuizSection = ({ quizRef }: QuizSectionProps) => {
@@ -29,12 +32,25 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
     schoolName: "",
     grade: "",
     english: "",
+    citizenship: "",
     motivation: "",
     scholarshipFactors: "",
     budget: "",
+    whatsapp: "",
+    instagram: "",
   });
 
-  const steps: QuizStep[] = ["role", "education", "schoolInfo", "english", "motivation", "scholarshipFactors", "budget", "booking"];
+  // Different step flows based on role
+  const getSteps = (): QuizStep[] => {
+    if (answers.role === "parent") {
+      // Parent flow: no motivation step
+      return ["role", "education", "schoolInfo", "english", "scholarshipFactors", "budget", "contact", "booking"];
+    }
+    // Student flow: includes citizenship and motivation
+    return ["role", "education", "schoolInfo", "english", "citizenship", "motivation", "scholarshipFactors", "budget", "contact", "booking"];
+  };
+
+  const steps = getSteps();
   const currentIndex = steps.indexOf(currentStep);
   const progress = ((currentIndex + 1) / steps.length) * 100;
 
@@ -51,16 +67,20 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
   };
 
   const goNext = () => {
-    const nextIndex = currentIndex + 1;
-    if (nextIndex < steps.length) {
-      setCurrentStep(steps[nextIndex]);
+    const currentSteps = getSteps();
+    const currentIdx = currentSteps.indexOf(currentStep);
+    const nextIndex = currentIdx + 1;
+    if (nextIndex < currentSteps.length) {
+      setCurrentStep(currentSteps[nextIndex]);
     }
   };
 
   const goBack = () => {
-    const prevIndex = currentIndex - 1;
+    const currentSteps = getSteps();
+    const currentIdx = currentSteps.indexOf(currentStep);
+    const prevIndex = currentIdx - 1;
     if (prevIndex >= 0) {
-      setCurrentStep(steps[prevIndex]);
+      setCurrentStep(currentSteps[prevIndex]);
     }
   };
 
@@ -74,12 +94,16 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
         return answers.schoolName !== "" && answers.grade !== "";
       case "english":
         return answers.english !== "";
+      case "citizenship":
+        return true; // Optional
       case "motivation":
         return countWords(answers.motivation) <= 75;
       case "scholarshipFactors":
         return true;
       case "budget":
         return answers.budget !== "";
+      case "contact":
+        return answers.whatsapp !== "" && answers.instagram !== "";
       case "booking":
         return true;
       default:
@@ -97,10 +121,10 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
 
   const getEducationLabel = (education: string) => {
     switch (education) {
+      case "middleschool": return "Ortaokul";
       case "highschool": return "Lise";
-      case "undergraduate": return "Lisans";
+      case "undergraduate": return "Üniversite";
       case "graduate": return "Yüksek Lisans";
-      case "professional": return "Çalışan";
       default: return education;
     }
   };
@@ -128,6 +152,8 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
     }
   };
 
+  const isParent = answers.role === "parent";
+  const subjectPrefix = isParent ? "Öğrencinin" : "";
 
   return (
     <section ref={quizRef} className="py-20 bg-hero-gradient">
@@ -188,15 +214,17 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
                     <GraduationCap className="w-5 h-5 text-secondary" />
                   </div>
-                  <h3 className="font-display text-2xl text-foreground">Eğitim Seviyeniz</h3>
+                  <h3 className="font-display text-2xl text-foreground">
+                    {isParent ? "Öğrencinin Eğitim Seviyesi" : "Eğitim Seviyeniz"}
+                  </h3>
                 </div>
                 
                 <div className="grid gap-3">
                   {[
-                    { value: "highschool", label: "Lise Öğrencisi" },
-                    { value: "undergraduate", label: "Lisans Öğrencisi" },
-                    { value: "graduate", label: "Yüksek Lisans / Doktora" },
-                    { value: "professional", label: "Çalışan Profesyonel" },
+                    { value: "middleschool", label: "Ortaokul" },
+                    { value: "highschool", label: "Lise" },
+                    { value: "undergraduate", label: "Üniversite" },
+                    { value: "graduate", label: "Yüksek Lisans" },
                   ].map((option) => (
                     <Button
                       key={option.value}
@@ -220,7 +248,9 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
                     <GraduationCap className="w-5 h-5 text-secondary" />
                   </div>
-                  <h3 className="font-display text-2xl text-foreground">Okul Bilgilerin</h3>
+                  <h3 className="font-display text-2xl text-foreground">
+                    {isParent ? "Öğrencinin Okul Bilgileri" : "Okul Bilgilerin"}
+                  </h3>
                 </div>
                 
                 <div className="grid gap-4">
@@ -229,7 +259,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       Okul Adı
                     </label>
                     <Input
-                      placeholder="Okulunuzun adını yazın"
+                      placeholder={isParent ? "Öğrencinin okulunun adını yazın" : "Okulunuzun adını yazın"}
                       value={answers.schoolName}
                       onChange={(e) => handleInputChange("schoolName", e.target.value)}
                       className="bg-background border-border"
@@ -237,7 +267,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-foreground mb-2 block">
-                      Not Ortalamanız (OBP/GPA)
+                      Not Ortalaması (OBP/GPA)
                     </label>
                     <Input
                       placeholder="Örn: 85.50 veya 3.5"
@@ -259,7 +289,9 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
                     <Languages className="w-5 h-5 text-secondary" />
                   </div>
-                  <h3 className="font-display text-2xl text-foreground">İngilizce Seviyeniz</h3>
+                  <h3 className="font-display text-2xl text-foreground">
+                    {isParent ? "Öğrencinin İngilizce Seviyesi" : "İngilizce Seviyeniz"}
+                  </h3>
                 </div>
                 
                 <div className="grid gap-3">
@@ -295,6 +327,34 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
               </div>
             )}
 
+            {currentStep === "citizenship" && (
+              <div className="animate-fade-up">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+                    <User className="w-5 h-5 text-secondary" />
+                  </div>
+                  <h3 className="font-display text-2xl text-foreground">Vatandaşlık / İkamet Durumu</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      Başvuruda gösterebileceğin vatandaşlık veya ikamet durumun nedir?
+                    </label>
+                    <Textarea
+                      placeholder="Örn: Türk vatandaşı, ABD vatandaşı, Green Card sahibi, Avrupa vatandaşı, çifte vatandaşlık vb."
+                      value={answers.citizenship}
+                      onChange={(e) => handleInputChange("citizenship", e.target.value)}
+                      className="bg-background border-border min-h-[100px]"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Opsiyonel - Bu bilgi burs ve kabul stratejisi için önemli olabilir
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {currentStep === "motivation" && (
               <div className="animate-fade-up">
                 <div className="flex items-center gap-3 mb-6">
@@ -317,7 +377,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                     />
                     <div className="flex justify-between mt-2">
                       <p className="text-xs text-muted-foreground">
-                        Maksimum 75 kelime
+                        Opsiyonel - Maksimum 75 kelime
                       </p>
                       <p className={`text-xs ${countWords(answers.motivation) > 75 ? 'text-destructive' : 'text-muted-foreground'}`}>
                         {countWords(answers.motivation)} / 75 kelime
@@ -340,16 +400,19 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium text-foreground mb-2 block">
-                      Sana burs verebilecek ne faktörler var? (Akademik başarı, proje, profesyonel spor, sanat vb.)
+                      {isParent 
+                        ? "Öğrenciye burs verebilecek faktörler neler?" 
+                        : "Sana burs verebilecek faktörler neler?"
+                      }
                     </label>
                     <Textarea
-                      placeholder="Örn: Yüksek GPA, TÜBİTAK projesi, milli takım sporcusu..."
+                      placeholder="Örn: Yüksek GPA, TÜBİTAK projesi, milli takım sporcusu, olimpiyat derecesi, sanat ödülleri, gönüllülük çalışmaları..."
                       value={answers.scholarshipFactors}
                       onChange={(e) => handleInputChange("scholarshipFactors", e.target.value)}
                       className="bg-background border-border min-h-[100px]"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Opsiyonel - Burs için güçlü yönlerini yaz
+                      Opsiyonel - Akademik başarı, proje, profesyonel spor, sanat, liderlik deneyimi vb.
                     </p>
                   </div>
                 </div>
@@ -392,6 +455,54 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       )}
                     </Button>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {currentStep === "contact" && (
+              <div className="animate-fade-up">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+                    <Phone className="w-5 h-5 text-secondary" />
+                  </div>
+                  <h3 className="font-display text-2xl text-foreground">İletişim Bilgileri</h3>
+                </div>
+                
+                <div className="grid gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      WhatsApp Numarası <span className="text-destructive">*</span>
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="+90 5XX XXX XX XX"
+                        value={answers.whatsapp}
+                        onChange={(e) => handleInputChange("whatsapp", e.target.value)}
+                        className="bg-background border-border pl-10"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Zorunlu - Size ulaşabilmemiz için gerekli
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      Instagram Kullanıcı Adı <span className="text-destructive">*</span>
+                    </label>
+                    <div className="relative">
+                      <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="@kullaniciadi veya 'yok'"
+                        value={answers.instagram}
+                        onChange={(e) => handleInputChange("instagram", e.target.value)}
+                        className="bg-background border-border pl-10"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Zorunlu - Instagram hesabınız yoksa "yok" yazın
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -553,6 +664,12 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       <span className="text-muted-foreground">İngilizce:</span>
                       <span className="font-medium">{getEnglishLabel(answers.english)}</span>
                     </div>
+                    {answers.citizenship && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Vatandaşlık:</span>
+                        <span className="font-medium text-right max-w-[60%]">{answers.citizenship}</span>
+                      </div>
+                    )}
                     {answers.scholarshipFactors && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Burs Faktörleri:</span>
@@ -562,6 +679,14 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Bütçe:</span>
                       <span className="font-medium">{getBudgetLabel(answers.budget)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">WhatsApp:</span>
+                      <span className="font-medium">{answers.whatsapp}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Instagram:</span>
+                      <span className="font-medium">{answers.instagram}</span>
                     </div>
                   </div>
                 </div>
