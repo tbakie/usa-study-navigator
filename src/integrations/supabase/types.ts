@@ -14,7 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      quiz_submissions: {
+        Row: {
+          budget: string | null
+          citizenship: string | null
+          created_at: string
+          education_level: string | null
+          english_level: string | null
+          id: string
+          instagram: string | null
+          motivation: string | null
+          recommended_package: string | null
+          role: string
+          scholarship_factors: string | null
+          school_info: string | null
+          whatsapp: string
+        }
+        Insert: {
+          budget?: string | null
+          citizenship?: string | null
+          created_at?: string
+          education_level?: string | null
+          english_level?: string | null
+          id?: string
+          instagram?: string | null
+          motivation?: string | null
+          recommended_package?: string | null
+          role: string
+          scholarship_factors?: string | null
+          school_info?: string | null
+          whatsapp: string
+        }
+        Update: {
+          budget?: string | null
+          citizenship?: string | null
+          created_at?: string
+          education_level?: string | null
+          english_level?: string | null
+          id?: string
+          instagram?: string | null
+          motivation?: string | null
+          recommended_package?: string | null
+          role?: string
+          scholarship_factors?: string | null
+          school_info?: string | null
+          whatsapp?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

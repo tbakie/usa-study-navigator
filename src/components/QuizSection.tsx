@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { ArrowRight, ArrowLeft, Calendar, User, GraduationCap, Languages, CheckCircle, DollarSign, Target, Phone, Instagram } from "lucide-react";
-
+import { ArrowRight, ArrowLeft, Calendar, User, GraduationCap, Languages, CheckCircle, DollarSign, Target, Phone, Instagram, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 interface QuizSectionProps {
   quizRef: React.RefObject<HTMLElement>;
 }
@@ -24,8 +25,11 @@ interface QuizAnswers {
   instagram: string;
 }
 
+const CALENDLY_URL = "https://calendly.com/amerikali-tbe/30min";
+
 const QuizSection = ({ quizRef }: QuizSectionProps) => {
   const [currentStep, setCurrentStep] = useState<QuizStep>("role");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [answers, setAnswers] = useState<QuizAnswers>({
     role: "",
     education: "",
@@ -39,6 +43,45 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
     whatsapp: "",
     instagram: "",
   });
+
+  const getRecommendedPackage = () => {
+    switch (answers.budget) {
+      case "0-5k": return "E-Kitap + Danışmanlık";
+      case "5k-15k": return "10 Aylık Danışmanlık + Tam Başvuru";
+      case "15k-30k": return "Aile Bazlı Planlama";
+      case "30k+": return "Premium Program";
+      default: return "Değerlendirme Gerekli";
+    }
+  };
+
+  const saveQuizData = async () => {
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.from("quiz_submissions").insert({
+        role: answers.role,
+        education_level: answers.education,
+        school_info: `${answers.schoolName} - GPA: ${answers.grade}`,
+        english_level: answers.english,
+        citizenship: answers.citizenship || null,
+        motivation: answers.motivation || null,
+        scholarship_factors: answers.scholarshipFactors || null,
+        budget: answers.budget,
+        whatsapp: answers.whatsapp,
+        instagram: answers.instagram,
+        recommended_package: getRecommendedPackage(),
+      });
+
+      if (error) throw error;
+      
+      toast.success("Bilgileriniz kaydedildi!");
+      window.open(CALENDLY_URL, "_blank");
+    } catch (error) {
+      console.error("Quiz kayıt hatası:", error);
+      toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Different step flows based on role
   const getSteps = (): QuizStep[] => {
@@ -712,9 +755,19 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   </div>
                 </div>
 
-                <Button variant="gold" size="xl" className="w-full mb-4">
-                  <Calendar className="w-5 h-5" />
-                  Görüşme Randevusu Al
+                <Button 
+                  variant="gold" 
+                  size="xl" 
+                  className="w-full mb-4"
+                  onClick={saveQuizData}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Calendar className="w-5 h-5" />
+                  )}
+                  {isSubmitting ? "Kaydediliyor..." : "Görüşme Randevusu Al"}
                 </Button>
 
                 <Button
