@@ -60,7 +60,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
       const { error } = await supabase.from("quiz_submissions").insert({
         role: answers.role,
         education_level: answers.education,
-        school_info: `${answers.schoolName} - GPA: ${answers.grade}`,
+        school_info: `${answers.schoolName} - Sınıf: ${answers.grade}`,
         english_level: answers.english,
         citizenship: answers.citizenship || null,
         motivation: answers.motivation || null,
@@ -310,16 +310,16 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-foreground mb-2 block">
-                      Not Ortalaması (OBP/GPA)
+                      Kaçıncı Sınıf
                     </label>
                     <Input
-                      placeholder="Örn: 85.50 veya 3.5"
+                      placeholder={isParent ? "Örn: 10. sınıf, 2. sınıf (üniversite)" : "Örn: 10. sınıf, 2. sınıf (üniversite)"}
                       value={answers.grade}
                       onChange={(e) => handleInputChange("grade", e.target.value)}
                       className="bg-background border-border"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Lise için OBP, üniversite için GPA yazabilirsiniz
+                      Şu anda hangi sınıfta olduğunu belirtin
                     </p>
                   </div>
                 </div>
