@@ -16,6 +16,7 @@ interface QuizAnswers {
   education: string;
   schoolName: string;
   grade: string;
+  gpa: string;
   english: string;
   citizenship: string;
   motivation: string;
@@ -35,6 +36,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
     education: "",
     schoolName: "",
     grade: "",
+    gpa: "",
     english: "",
     citizenship: "",
     motivation: "",
@@ -60,7 +62,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
       const { error } = await supabase.from("quiz_submissions").insert({
         role: answers.role,
         education_level: answers.education,
-        school_info: `${answers.schoolName} - Sınıf: ${answers.grade}`,
+        school_info: `${answers.schoolName} | Sınıf: ${answers.grade} | Not: ${answers.gpa}`,
         english_level: answers.english,
         citizenship: answers.citizenship || null,
         motivation: answers.motivation || null,
@@ -134,7 +136,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
       case "education":
         return answers.education !== "";
       case "schoolInfo":
-        return answers.schoolName !== "" && answers.grade !== "";
+        return answers.schoolName !== "" && answers.grade !== "" && answers.gpa !== "";
       case "english":
         return answers.english !== "";
       case "citizenship":
@@ -313,13 +315,24 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       Kaçıncı Sınıf
                     </label>
                     <Input
-                      placeholder={isParent ? "Örn: 10. sınıf, 2. sınıf (üniversite)" : "Örn: 10. sınıf, 2. sınıf (üniversite)"}
+                      placeholder="Örn: 10. sınıf, 2. sınıf (üniversite)"
                       value={answers.grade}
                       onChange={(e) => handleInputChange("grade", e.target.value)}
                       className="bg-background border-border"
                     />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      Not Ortalaması (OBP/GPA)
+                    </label>
+                    <Input
+                      placeholder="Örn: 85.50 veya 3.5"
+                      value={answers.gpa}
+                      onChange={(e) => handleInputChange("gpa", e.target.value)}
+                      className="bg-background border-border"
+                    />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Şu anda hangi sınıfta olduğunu belirtin
+                      Lise için OBP, üniversite için GPA yazabilirsiniz
                     </p>
                   </div>
                 </div>
