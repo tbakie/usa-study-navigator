@@ -2,14 +2,15 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { ArrowRight, ArrowLeft, Calendar, User, GraduationCap, Languages, CheckCircle, DollarSign, Target, Phone, Instagram, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, Calendar, User, GraduationCap, Languages, CheckCircle, DollarSign, Target, Phone, Instagram, Loader2, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import PackageDetailsDialog from "./PackageDetailsDialog";
 interface QuizSectionProps {
   quizRef: React.RefObject<HTMLElement>;
 }
 
-type QuizStep = "role" | "education" | "schoolInfo" | "english" | "citizenship" | "motivation" | "scholarshipFactors" | "budget" | "contact" | "booking";
+type QuizStep = "role" | "education" | "schoolInfo" | "english" | "motivationAndCitizenship" | "scholarshipFactors" | "budget" | "contact" | "booking";
 
 interface QuizAnswers {
   role: string;
@@ -31,6 +32,7 @@ const CALENDLY_URL = "https://calendly.com/amerikali-tbe/30min";
 const QuizSection = ({ quizRef }: QuizSectionProps) => {
   const [currentStep, setCurrentStep] = useState<QuizStep>("role");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openPackageDialog, setOpenPackageDialog] = useState<"ebook" | "consultation" | "full" | null>(null);
   const [answers, setAnswers] = useState<QuizAnswers>({
     role: "",
     education: "",
@@ -85,14 +87,9 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
     }
   };
 
-  // Different step flows based on role
+  // Different step flows based on role - both have same flow now with combined motivation/citizenship
   const getSteps = (): QuizStep[] => {
-    if (answers.role === "parent") {
-      // Parent flow: includes citizenship before scholarshipFactors
-      return ["role", "education", "schoolInfo", "english", "citizenship", "scholarshipFactors", "budget", "contact", "booking"];
-    }
-    // Student flow: includes citizenship and motivation
-    return ["role", "education", "schoolInfo", "english", "citizenship", "motivation", "scholarshipFactors", "budget", "contact", "booking"];
+    return ["role", "education", "schoolInfo", "english", "motivationAndCitizenship", "scholarshipFactors", "budget", "contact", "booking"];
   };
 
   const steps = getSteps();
@@ -139,10 +136,8 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
         return answers.schoolName !== "" && answers.grade !== "" && answers.gpa !== "";
       case "english":
         return answers.english !== "";
-      case "citizenship":
-        return true; // Optional
-      case "motivation":
-        return countWords(answers.motivation) <= 75;
+      case "motivationAndCitizenship":
+        return countWords(answers.motivation) <= 75; // Both are optional, just check word limit
       case "scholarshipFactors":
         return true;
       case "budget":
@@ -383,57 +378,29 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
               </div>
             )}
 
-            {currentStep === "citizenship" && (
-              <div className="animate-fade-up">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
-                    <User className="w-5 h-5 text-secondary" />
-                  </div>
-                  <h3 className="font-display text-2xl text-foreground">
-                    {isParent ? "Öğrencinin Vatandaşlık / İkamet Durumu" : "Vatandaşlık / İkamet Durumu"}
-                  </h3>
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">
-                      {isParent 
-                        ? "Başvuruda gösterebileceğiniz vatandaşlık veya ikamet durumu nedir?" 
-                        : "Başvuruda gösterebileceğin vatandaşlık veya ikamet durumun nedir?"}
-                    </label>
-                    <Textarea
-                      placeholder="Örn: Türk vatandaşı, ABD vatandaşı, Green Card sahibi, Avrupa vatandaşı, çifte vatandaşlık vb."
-                      value={answers.citizenship}
-                      onChange={(e) => handleInputChange("citizenship", e.target.value)}
-                      className="bg-background border-border min-h-[100px]"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Opsiyonel - Bu bilgi burs ve kabul stratejisi için önemli olabilir
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {currentStep === "motivation" && (
+            {currentStep === "motivationAndCitizenship" && (
               <div className="animate-fade-up">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
                     <Target className="w-5 h-5 text-secondary" />
                   </div>
-                  <h3 className="font-display text-2xl text-foreground">Hedefin ve Motivasyonun</h3>
+                  <h3 className="font-display text-2xl text-foreground">
+                    {isParent ? "Hedef ve Durum" : "Hedefin ve Durumun"}
+                  </h3>
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
                     <label className="text-sm font-medium text-foreground mb-2 block">
-                      ABD'de üniversite hedefin ne kadar ciddi ve neden burada okumak istiyorsun?
+                      {isParent 
+                        ? "Öğrencinin ABD'de üniversite hedefi ve motivasyonu nedir?" 
+                        : "ABD'de üniversite hedefin ne kadar ciddi ve neden burada okumak istiyorsun?"}
                     </label>
                     <Textarea
                       placeholder="Hedeflerini ve motivasyonunu buraya yaz..."
                       value={answers.motivation}
                       onChange={(e) => handleInputChange("motivation", e.target.value)}
-                      className="bg-background border-border min-h-[120px]"
+                      className="bg-background border-border min-h-[100px]"
                     />
                     <div className="flex justify-between mt-2">
                       <p className="text-xs text-muted-foreground">
@@ -444,7 +411,28 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       </p>
                     </div>
                   </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      {isParent 
+                        ? "Öğrencinin vatandaşlık / ikamet durumu nedir?" 
+                        : "Vatandaşlık / ikamet durumun nedir?"}
+                    </label>
+                    <Textarea
+                      placeholder="Örn: Türk vatandaşı, ABD vatandaşı, Green Card sahibi, Avrupa vatandaşı, çifte vatandaşlık vb."
+                      value={answers.citizenship}
+                      onChange={(e) => handleInputChange("citizenship", e.target.value)}
+                      className="bg-background border-border min-h-[80px]"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Opsiyonel - Bu bilgi burs ve kabul stratejisi için önemli olabilir
+                    </p>
+                  </div>
                 </div>
+
+                <p className="text-xs text-muted-foreground mt-4 text-center">
+                  Bu alanlar opsiyoneldir, cevaplamadan devam edebilirsiniz
+                </p>
               </div>
             )}
 
@@ -466,13 +454,13 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       }
                     </label>
                     <Textarea
-                      placeholder="Örn: Yüksek GPA, TÜBİTAK projesi, milli takım sporcusu, olimpiyat derecesi, sanat ödülleri, gönüllülük çalışmaları..."
+                      placeholder="Örn: Yüksek not ortalaması, TÜBİTAK projesi, milli takım sporcusu, olimpiyat derecesi, sanat ödülleri, gönüllülük çalışmaları, SAT skoru, AP dersleri..."
                       value={answers.scholarshipFactors}
                       onChange={(e) => handleInputChange("scholarshipFactors", e.target.value)}
                       className="bg-background border-border min-h-[100px]"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Opsiyonel - Akademik başarı, proje, profesyonel spor, sanat, liderlik deneyimi vb.
+                      Opsiyonel - Yüksek not ortalaması, proje, profesyonel spor, sanat, liderlik deneyimi, SAT skoru veya AP dersleri vb.
                     </p>
                   </div>
                 </div>
@@ -489,7 +477,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                 </div>
                 
                 <p className="text-muted-foreground mb-4">
-                  Burs olmadığı durumda aileniz yıllık yaklaşık ne kadar bütçe ayırabilir? (Dolar bazında)
+                  Burs olmadığı durumda aileniz <span className="font-bold text-foreground">yıllık</span> yaklaşık ne kadar bütçe ayırabilir? (Dolar bazında)
                 </p>
                 
                 <div className="grid gap-3">
@@ -583,24 +571,35 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       İlk adım olarak aşağıdaki içeriklerle süreci netleştir.
                     </p>
                     <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
-                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group">
+                      <button 
+                        onClick={() => setOpenPackageDialog("ebook")}
+                        className="flex items-start gap-3 w-full text-left hover:bg-muted/80 rounded-lg p-3 transition-colors group"
+                      >
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
                         <div className="flex-1">
                           <div className="font-semibold">$25 E-Kitap</div>
                           <div className="text-sm text-muted-foreground">ABD'de okumak için kapsamlı rehber</div>
-                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
+                          <div className="flex items-center gap-1 text-xs text-secondary mt-1">
+                            <Info className="w-3 h-3" />
+                            Detaylı bilgi için tıkla
+                          </div>
                         </div>
                       </button>
-                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group">
+                      <button 
+                        onClick={() => setOpenPackageDialog("consultation")}
+                        className="flex items-start gap-3 w-full text-left hover:bg-muted/80 rounded-lg p-3 transition-colors group"
+                      >
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
                         <div className="flex-1">
                           <div className="font-semibold">$120 Birebir Danışmanlık + VIP WhatsApp Grubu</div>
                           <div className="text-sm text-muted-foreground">Kişiselleştirilmiş rehberlik ve topluluk desteği</div>
-                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
+                          <div className="flex items-center gap-1 text-xs text-secondary mt-1">
+                            <Info className="w-3 h-3" />
+                            Detaylı bilgi için tıkla
+                          </div>
                         </div>
                       </button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-4">* Henüz tüm detaylar eklenmedi - yakında güncellenecek</p>
                   </div>
                 )}
 
@@ -616,37 +615,54 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       Uygunluk durumunda aileyle değerlendirme görüşmesi yapılabilir.
                     </p>
                     <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
-                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group">
+                      <button 
+                        onClick={() => setOpenPackageDialog("ebook")}
+                        className="flex items-start gap-3 w-full text-left hover:bg-muted/80 rounded-lg p-3 transition-colors group"
+                      >
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
                         <div className="flex-1">
                           <div className="font-semibold">$25 E-Kitap</div>
                           <div className="text-sm text-muted-foreground">ABD'de okumak için kapsamlı rehber</div>
-                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
+                          <div className="flex items-center gap-1 text-xs text-secondary mt-1">
+                            <Info className="w-3 h-3" />
+                            Detaylı bilgi için tıkla
+                          </div>
                         </div>
                       </button>
-                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group">
+                      <button 
+                        onClick={() => setOpenPackageDialog("consultation")}
+                        className="flex items-start gap-3 w-full text-left hover:bg-muted/80 rounded-lg p-3 transition-colors group"
+                      >
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
                         <div className="flex-1">
                           <div className="font-semibold">$120 Birebir Danışmanlık + VIP WhatsApp Grubu</div>
                           <div className="text-sm text-muted-foreground">Kişiselleştirilmiş rehberlik ve topluluk desteği</div>
-                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
+                          <div className="flex items-center gap-1 text-xs text-secondary mt-1">
+                            <Info className="w-3 h-3" />
+                            Detaylı bilgi için tıkla
+                          </div>
                         </div>
                       </button>
-                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group p-4 bg-secondary/10 rounded-lg border border-destructive/40">
+                      <button 
+                        onClick={() => setOpenPackageDialog("full")}
+                        className="flex items-start gap-3 w-full text-left p-4 bg-secondary/10 rounded-lg border border-destructive/40 hover:bg-secondary/20 transition-colors group"
+                      >
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
                         <div className="flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold">10 Aylık Danışmanlık + Tam Başvuru Süreci</span>
+                            <span className="font-semibold">10 Aylık Danışmanlık + Koçluk</span>
                             <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
-                              Sınırlı Kontenjan
+                              Sınırlı Kontenjan: 20 Kişi
                             </span>
                           </div>
                           <div className="text-sm text-muted-foreground mt-1">Aile ile toplantı: Detaylı planlama ve strateji görüşmesi</div>
-                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
+                          <div className="flex items-center gap-1 text-xs text-secondary mt-1">
+                            <Info className="w-3 h-3" />
+                            Detaylı bilgi için tıkla
+                          </div>
                         </div>
                       </button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-4">* Henüz tüm detaylar eklenmedi - yakında güncellenecek</p>
                   </div>
                 )}
 
@@ -663,26 +679,42 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       Uygunluk durumunu netleştirmek için görüşme alabilirsin.
                     </p>
                     <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
-                      <button className="flex items-start gap-3 w-full text-left p-4 bg-secondary/10 rounded-lg border border-secondary/20 hover:bg-secondary/20 transition-colors group">
+                      <button 
+                        onClick={() => setOpenPackageDialog("full")}
+                        className="flex items-start gap-3 w-full text-left p-4 bg-secondary/10 rounded-lg border border-secondary/20 hover:bg-secondary/20 transition-colors group"
+                      >
                         <div className="flex-1">
-                          <div className="font-semibold text-secondary">10 Aylık Danışmanlık + Tam Başvuru Süreci</div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-secondary">10 Aylık Danışmanlık + Koçluk</span>
+                            <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
+                              Sınırlı Kontenjan: 20 Kişi
+                            </span>
+                          </div>
                           <div className="text-sm text-muted-foreground mt-1">
                             Aile ile toplantı: Tüm süreci beraber yönettiğimiz, özel burslara başvurduğumuz, 
                             Amerika'nın en iyi okullarına kabul için en güçlü başvuru biçimi
                           </div>
-                          <div className="text-xs text-secondary mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
+                          <div className="flex items-center gap-1 text-xs text-secondary mt-2">
+                            <Info className="w-3 h-3" />
+                            Detaylı bilgi için tıkla
+                          </div>
                         </div>
                       </button>
-                      <button className="flex items-start gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors group">
+                      <button 
+                        onClick={() => setOpenPackageDialog("consultation")}
+                        className="flex items-start gap-3 w-full text-left hover:bg-muted/80 rounded-lg p-3 transition-colors group"
+                      >
                         <CheckCircle className="w-5 h-5 text-secondary mt-0.5" />
                         <div className="flex-1">
                           <div className="font-semibold">$120 Birebir Danışmanlık + VIP WhatsApp Grubu</div>
                           <div className="text-sm text-muted-foreground">Kişiselleştirilmiş rehberlik ve topluluk desteği</div>
-                          <div className="text-xs text-secondary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
+                          <div className="flex items-center gap-1 text-xs text-secondary mt-1">
+                            <Info className="w-3 h-3" />
+                            Detaylı bilgi için tıkla
+                          </div>
                         </div>
                       </button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-4">* Henüz tüm detaylar eklenmedi - yakında güncellenecek</p>
                   </div>
                 )}
 
@@ -698,25 +730,37 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
                       En kapsamlı danışmanlık programımız için uygunsunuz.
                     </p>
                     <div className="bg-muted/50 rounded-xl p-6 text-left space-y-4">
-                      <button className="flex items-start gap-3 w-full text-left p-4 bg-secondary/10 rounded-lg border border-secondary/20 hover:bg-secondary/20 transition-colors group">
+                      <button 
+                        onClick={() => setOpenPackageDialog("full")}
+                        className="flex items-start gap-3 w-full text-left p-4 bg-secondary/10 rounded-lg border border-secondary/20 hover:bg-secondary/20 transition-colors group"
+                      >
                         <div className="flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-secondary">10 Aylık Danışmanlık + Tam Başvuru Süreci</span>
+                            <span className="font-semibold text-secondary">10 Aylık Danışmanlık + Koçluk</span>
                             <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full font-medium">
-                              Sınırlı Kontenjan
+                              Sınırlı Kontenjan: 20 Kişi
                             </span>
                           </div>
                           <div className="text-sm text-muted-foreground mt-1">
                             Aile ile toplantı: Tüm süreci beraber yönettiğimiz, özel burslara başvurduğumuz, 
                             Amerika'nın en iyi okullarına kabul için en güçlü başvuru biçimi
                           </div>
-                          <div className="text-xs text-secondary mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Detaylı bilgi için tıkla →</div>
+                          <div className="flex items-center gap-1 text-xs text-secondary mt-2">
+                            <Info className="w-3 h-3" />
+                            Detaylı bilgi için tıkla
+                          </div>
                         </div>
                       </button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-4">* Henüz tüm detaylar eklenmedi - yakında güncellenecek</p>
                   </div>
                 )}
+
+                {/* Package Details Dialog */}
+                <PackageDetailsDialog 
+                  open={openPackageDialog !== null} 
+                  onOpenChange={(open) => !open && setOpenPackageDialog(null)}
+                  packageType={openPackageDialog || "ebook"}
+                />
 
                 <div className="bg-muted/30 rounded-xl p-4 mb-6 text-left">
                   <div className="text-sm text-muted-foreground mb-2">Profilin:</div>
