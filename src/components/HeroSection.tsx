@@ -1,5 +1,7 @@
-import { Play, Instagram, Calendar } from "lucide-react";
+import { Instagram, Calendar } from "lucide-react";
 import { Button } from "./ui/button";
+import tbeLogo from "@/assets/tbe-logo.png";
+
 interface HeroSectionProps {
   onStartQuiz: () => void;
 }
@@ -15,11 +17,20 @@ const HeroSection = ({
       }} />
       </div>
 
-      <div className="relative container mx-auto px-4 pt-12 pb-20">
+      <div className="relative container mx-auto px-4 pt-8 pb-20">
+        {/* Logo */}
+        <div className="flex justify-center mb-4">
+          <img 
+            src={tbeLogo} 
+            alt="TBE Academy Logo" 
+            className="w-20 h-20 md:w-24 md:h-24 rounded-full shadow-lg border-2 border-secondary/30"
+          />
+        </div>
+        
         {/* Instagram badge */}
-        <div className="flex justify-center mb-8">
-          <a href="#" className="inline-flex items-center gap-2 bg-card/10 backdrop-blur-sm text-cream px-4 py-2 rounded-full text-sm border border-card/20 hover:bg-card/20 transition-all">
-            <Instagram className="w-4 h-4" />
+        <div className="flex justify-center mb-6">
+          <a href="https://instagram.com/amerikali.tbe" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-card/10 backdrop-blur-sm text-cream px-3 py-1.5 rounded-full text-xs border border-card/20 hover:bg-card/20 transition-all">
+            <Instagram className="w-3 h-3" />
             <span>@amerikali.tbe</span>
           </a>
         </div>
@@ -66,14 +77,14 @@ const HeroSection = ({
         {/* Stats */}
         <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto">
           {[{
-          number: "500+",
+          number: "100+",
           label: "Öğrenciye Yardım"
         }, {
-          number: "$2M+",
+          number: "$650K+",
           label: "Kazanılan Burs"
         }, {
-          number: "%98",
-          label: "Başarı Oranı"
+          number: "%90",
+          label: "Okul Kabul Oranı"
         }].map((stat, index) => <div key={index} className="text-center">
               <div className="font-display text-2xl md:text-3xl text-secondary mb-1">
                 {stat.number}
