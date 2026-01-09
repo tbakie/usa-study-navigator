@@ -10,7 +10,7 @@ interface QuizSectionProps {
   quizRef: React.RefObject<HTMLElement>;
 }
 
-type QuizStep = "role" | "education" | "schoolInfo" | "english" | "motivationAndCitizenship" | "scholarshipFactors" | "budget" | "contact" | "booking";
+type QuizStep = "role" | "education" | "schoolInfo" | "english" | "motivationAndCitizenship" | "scholarshipFactors" | "budget" | "contact" | "booking" | "calendly";
 
 interface QuizAnswers {
   role: string;
@@ -32,6 +32,7 @@ const CALENDLY_URL = "https://calendly.com/amerikali-tbe/30min";
 const QuizSection = ({ quizRef }: QuizSectionProps) => {
   const [currentStep, setCurrentStep] = useState<QuizStep>("role");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dataSubmitted, setDataSubmitted] = useState(false);
   const [openPackageDialog, setOpenPackageDialog] = useState<"ebook" | "consultation" | "full" | null>(null);
   const [answers, setAnswers] = useState<QuizAnswers>({
     role: "",
@@ -78,7 +79,8 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
       if (error) throw error;
       
       toast.success("Bilgileriniz kaydedildi!");
-      window.open(CALENDLY_URL, "_blank");
+      setDataSubmitted(true);
+      setCurrentStep("calendly");
     } catch (error) {
       console.error("Quiz kayıt hatası:", error);
       toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
@@ -89,7 +91,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
 
   // Different step flows based on role - both have same flow now with combined motivation/citizenship
   const getSteps = (): QuizStep[] => {
-    return ["role", "education", "schoolInfo", "english", "motivationAndCitizenship", "scholarshipFactors", "budget", "contact", "booking"];
+    return ["role", "education", "schoolInfo", "english", "motivationAndCitizenship", "scholarshipFactors", "budget", "contact", "booking", "calendly"];
   };
 
   const steps = getSteps();
@@ -838,8 +840,28 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
               </div>
             )}
 
+            {currentStep === "calendly" && (
+              <div className="animate-fade-up">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-secondary" />
+                  </div>
+                  <h3 className="font-display text-2xl text-foreground">Randevunu Seç</h3>
+                </div>
+                
+                <p className="text-muted-foreground mb-6">
+                  Bilgilerin kaydedildi! Şimdi aşağıdan sana uygun bir randevu zamanı seç.
+                </p>
+                
+                <div 
+                  className="calendly-inline-widget rounded-xl overflow-hidden" 
+                  data-url="https://calendly.com/amerikali-tbe/30min"
+                  style={{ minWidth: '100%', height: '600px' }}
+                />
+              </div>
+            )}
             {/* Navigation */}
-            {currentStep !== "booking" && (
+            {currentStep !== "booking" && currentStep !== "calendly" && (
               <div className="flex justify-between mt-8 pt-6 border-t border-border">
                 <Button
                   variant="ghost"
