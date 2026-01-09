@@ -41,15 +41,14 @@ const HeroSection = ({
         {/* Video section */}
         <div className="max-w-2xl mx-auto mb-8">
           <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lifted bg-primary/50 backdrop-blur-sm border border-card/20">
-            {/* Video placeholder - replace with actual video */}
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-navy to-navy-light">
-              <div className="text-center">
-                <button className="w-20 h-20 rounded-full bg-gold-gradient flex items-center justify-center shadow-gold hover:scale-110 transition-transform mb-4 mx-auto">
-                  <Play className="w-8 h-8 text-primary ml-1" fill="currentColor" />
-                </button>
-                <p className="text-cream/60 text-sm">Senin için hazırladığım videoyu izle</p>
-              </div>
-            </div>
+            <iframe
+              className="absolute inset-0 w-full h-full"
+              src="https://www.youtube.com/embed/1J_mPoaYAiM?autoplay=1&mute=1&rel=0"
+              title="Amerika'da Eğitim"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
           </div>
         </div>
 
