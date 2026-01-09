@@ -15,7 +15,7 @@ const FloatingBookingButton = ({ onClick }: FloatingBookingButtonProps) => {
         className="shadow-gold animate-float rounded-full px-6"
       >
         <Calendar className="w-5 h-5" />
-        <span className="hidden sm:inline">Randevu Al</span>
+        <span>Randevu Al</span>
       </Button>
     </div>
   );
