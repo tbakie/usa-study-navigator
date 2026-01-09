@@ -44,8 +44,9 @@ const HeroSection = ({
           </h1>
           
           <p className="text-cream/80 text-lg md:text-xl mb-10 font-body leading-relaxed">
-            Üniversite başvuruları, burslar ve Amerikan rüyanı gerçekleştirmek için uzman rehberlik. 
-            500+ öğrencinin hedeflerine ulaşmasına yardım ettim.
+            <span className="text-secondary font-semibold">100+ öğrenciyi</span> hayallerindeki Amerikan üniversitelerine yerleştirdim. 
+            Şimdi sıra sende — <span className="text-cream font-medium">burs kazanmak, doğru okulu bulmak ve kabul almak</span> için 
+            yanındayım.
           </p>
         </div>
 
