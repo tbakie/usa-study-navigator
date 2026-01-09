@@ -44,9 +44,9 @@ const HeroSection = ({
           </h1>
           
           <p className="text-cream/80 text-lg md:text-xl mb-10 font-body leading-relaxed">
-            <span className="text-secondary font-semibold">100+ öğrenciyi</span> hayallerindeki Amerikan üniversitelerine yerleştirdim. 
+            <span className="text-secondary font-semibold">Ekibimizle birlikte 100+ öğrenciye</span> Amerikan üniversitesi hayallerini gerçekleştirmelerinde yardım ettik. 
             Şimdi sıra sende — <span className="text-cream font-medium">burs kazanmak, doğru okulu bulmak ve kabul almak</span> için 
-            yanındayım.
+            yanındayız.
           </p>
         </div>
 
