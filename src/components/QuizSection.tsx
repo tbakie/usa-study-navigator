@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -28,6 +28,62 @@ interface QuizAnswers {
 }
 
 const CALENDLY_URL = "https://calendly.com/amerikali-tbe/30min";
+
+// Calendly Embed Component
+const CalendlyEmbed = () => {
+  const calendlyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Wait for Calendly script to load and initialize
+    const initCalendly = () => {
+      if ((window as any).Calendly && calendlyRef.current) {
+        (window as any).Calendly.initInlineWidget({
+          url: CALENDLY_URL,
+          parentElement: calendlyRef.current,
+          prefill: {},
+          utm: {}
+        });
+      }
+    };
+
+    // Check if Calendly is already loaded
+    if ((window as any).Calendly) {
+      initCalendly();
+    } else {
+      // Wait for script to load
+      const checkCalendly = setInterval(() => {
+        if ((window as any).Calendly) {
+          clearInterval(checkCalendly);
+          initCalendly();
+        }
+      }, 100);
+
+      // Cleanup interval after 10 seconds
+      setTimeout(() => clearInterval(checkCalendly), 10000);
+    }
+  }, []);
+
+  return (
+    <div className="animate-fade-up">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+          <Calendar className="w-5 h-5 text-secondary" />
+        </div>
+        <h3 className="font-display text-2xl text-foreground">Randevunu Seç</h3>
+      </div>
+      
+      <p className="text-muted-foreground mb-6">
+        Bilgilerin kaydedildi! Şimdi aşağıdan sana uygun bir randevu zamanı seç.
+      </p>
+      
+      <div 
+        ref={calendlyRef}
+        className="rounded-xl overflow-hidden bg-white"
+        style={{ minWidth: '100%', minHeight: '650px' }}
+      />
+    </div>
+  );
+};
 
 const QuizSection = ({ quizRef }: QuizSectionProps) => {
   const [currentStep, setCurrentStep] = useState<QuizStep>("role");
@@ -841,24 +897,7 @@ const QuizSection = ({ quizRef }: QuizSectionProps) => {
             )}
 
             {currentStep === "calendly" && (
-              <div className="animate-fade-up">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-secondary" />
-                  </div>
-                  <h3 className="font-display text-2xl text-foreground">Randevunu Seç</h3>
-                </div>
-                
-                <p className="text-muted-foreground mb-6">
-                  Bilgilerin kaydedildi! Şimdi aşağıdan sana uygun bir randevu zamanı seç.
-                </p>
-                
-                <div 
-                  className="calendly-inline-widget rounded-xl overflow-hidden" 
-                  data-url="https://calendly.com/amerikali-tbe/30min"
-                  style={{ minWidth: '100%', height: '600px' }}
-                />
-              </div>
+              <CalendlyEmbed />
             )}
             {/* Navigation */}
             {currentStep !== "booking" && currentStep !== "calendly" && (
